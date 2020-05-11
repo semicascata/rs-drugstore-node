@@ -133,7 +133,6 @@ export default {
           expiresIn: 3600
         })
 
-        // Token --> Cookies
         console.log(`\nUser ${user.username} logged in!`.green)
         res.status(200).send({
           sucess: true,
