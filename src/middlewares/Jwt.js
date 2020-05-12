@@ -7,10 +7,10 @@ export default {
     let token
 
     // Check if there is a token on cookies
-    if (req.headers['x-access-token'] && req.headers['x-access-token'] !== 'none') {
+    if (req.headers['x-access-token'] && req.headers['x-access-token'] !== undefined) {
       token = req.headers['x-access-token']
-      // console.log(`\nX-Access-Token: ${token}`.green.bold)
-      console.log('X-Access-Token: OK'.green.bold)
+      console.log(`X-Access-Token: ${token}`.green.bold)
+      // console.log('X-Access-Token: OK'.green.bold)
     }
 
     // if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
@@ -19,7 +19,7 @@ export default {
     // }
 
     try {
-      if(!token || token === 'none') {
+      if(!token || token === undefined) {
         console.log('User not logged in'.red)
 
         res.status(401).send({

@@ -1,5 +1,6 @@
 import AuthControl from '../controllers/AuthControl'
 import Drugstore from '../controllers/Drugstore'
+import AdminBoard from '../controllers/AdminBoard'
 import Jwt from '../middlewares/Jwt'
 
 // Custom URL
@@ -18,12 +19,18 @@ export default (app) => {
     app.post(`${url}/auth/register`, AuthControl.register)
     app.post(`${url}/auth/login`, AuthControl.login)
     app.get(`${url}/auth/logout`, AuthControl.logout)
-    app.get(`${url}/auth/user`, AuthControl.user)
+    app.get(`${url}/auth/user`, Jwt.protect, AuthControl.user)
 
     // Drugstore
     app.get(`${url}/drugstore`, Jwt.protect, Drugstore.getDrugs)
-    app.post(`${url}/drugstore`, Jwt.protect, Drugstore.createDrug)
     app.get(`${url}/drugstore/:id`, Jwt.protect, Drugstore.getDrug)
-    app.put(`${url}/drugstore/:id`, Jwt.protect, Drugstore.updateDrug)
-    app.delete(`${url}/drugstore/:id`, Jwt.protect, Drugstore.deleteDrug)
+    app.post(`${url}/drugstore`, Jwt.authorize('admin'), Jwt.protect, Drugstore.createDrug)
+    app.put(`${url}/drugstore/:id`, Jwt.authorize('admin'), Jwt.protect, Drugstore.updateDrug)
+    app.delete(`${url}/drugstore/:id`, Jwt.authorize('admin'), Jwt.protect, Drugstore.deleteDrug)
+
+    // Admin Board
+    app.get(`${url}/users`, Jwt.protect, Jwt.authorize('admin'), AdminBoard.getUsers)
+    app.get(`${url}/users/:id`, Jwt.protect, Jwt.authorize('admin'), AdminBoard.getUser)
+    app.put(`${url}/users/:id`, Jwt.protect, Jwt.authorize('admin'), AdminBoard.updateUser)
+    app.delete(`${url}/users/:id`, Jwt.protect, Jwt.authorize('admin'), AdminBoard.deleteUser)
 }
