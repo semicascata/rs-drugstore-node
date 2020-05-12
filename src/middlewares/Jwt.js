@@ -9,7 +9,8 @@ export default {
     // Check if there is a token on cookies
     if (req.headers['x-access-token'] && req.headers['x-access-token'] !== 'none') {
       token = req.headers['x-access-token']
-      console.log(`\nX-Access-Token: ${token}\n`.red.bold)
+      // console.log(`\nX-Access-Token: ${token}`.green.bold)
+      console.log('X-Access-Token: OK'.green.bold)
     }
 
     // if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
@@ -19,7 +20,7 @@ export default {
 
     try {
       if(!token || token === 'none') {
-        console.log('\nNeed to log in to access this page\n'.red)
+        console.log('User not logged in'.red)
 
         res.status(401).send({
           success: false,
@@ -32,11 +33,11 @@ export default {
       req.user = await User.findById(decodedToken.id)
 
       const loggedUser = req.user
-      console.log(`\nUser ${loggedUser.username} authenticated!`.green)
+      console.log(`Authentication OK for user: ${loggedUser.username}`.green)
       next()
 
     } catch(err) {
-      console.log('\nAuthentication failed'.red)
+      console.log('Authentication failed'.red)
       res.status(401).send({
         sucess: false,
         error: `${err.message}`
@@ -53,7 +54,7 @@ export default {
       // console.log(user)
 
       if(!roles.includes(user.role)) {
-        console.log('User role is not authorized to access this route\n'.red)
+        console.log('User role is not authorized to access this route'.red)
 
         res.status(403).send({
           success: false,
@@ -61,8 +62,8 @@ export default {
         })
         return false
       }
-      
-      console.log('Authorized!'.cyan)
+
+      console.log('Authorized'.cyan.bold)
       next()
     }
   }

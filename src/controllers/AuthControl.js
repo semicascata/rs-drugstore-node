@@ -73,13 +73,13 @@ export default {
           newUser.save()
           .then(user => {
 
-            console.log(`\nUser ${newUser.username} successfully registered!\n User role: ${newUser.role}`.green.bold)
+            console.log(`User "${newUser.username}" registered\n User role: ${newUser.role}`.green.bold)
 
             res.status(201).send(user)
           })
           .catch(err => {
 
-            console.log(`\nError when trying to save the user ${newUser.username}...\nError: ${err.message}`.red.bold)
+            console.log(`Error when trying to save the user "${newUser.username}"\nError: ${err.message}`.red.bold)
 
             res.status(401).send(`Error when trying to save the user \"${newUser.username}\"`)
           })
@@ -96,7 +96,7 @@ export default {
 
     // Validation
     if(!username || !password) {
-      console.log('\nPlease, provide an username and password'.red)
+      console.log('Please, provide an username and password'.red)
       res.status(401).send({
         success: false,
         message: 'Please, provide an username and password'
@@ -109,7 +109,7 @@ export default {
 
     // Check if user exists
     if(!user) {
-      console.log(`\nFailed. User ${username} not found`.red)
+      console.log(`Failed. User ${username} not found`.red)
 
       res.status(404).send({
         success: false,
@@ -133,7 +133,7 @@ export default {
           expiresIn: 3600
         })
 
-        console.log(`\nUser ${user.username} logged in!`.green)
+        console.log(`User "${user.username}" logged in`.green)
         res.status(200).send({
           sucess: true,
           message: `User ${user.username} logged in!`,
@@ -143,7 +143,7 @@ export default {
         })
 
       } else {
-        console.log('\nInvalid password'.red)
+        console.log('Invalid password'.red)
         res.status(401).send({
           success: false,
           message: 'Invalid password'
@@ -168,7 +168,7 @@ export default {
 
     } else {
 
-      console.log('User logged out, there ain\'t no X-Access-Token'.red)
+      console.log('User logged out, there is no X-Access-Token'.red)
 
       res.status(201).send({
         success: true,
@@ -189,8 +189,9 @@ export default {
 
         token = req.headers['x-access-token']
 
-        console.log(`\nToken from x-access: ${token}`.red.bold)
+        // console.log(`Token from x-access: ${token}`.red.bold)
       }
+      console.log('Get User - X-Access-Token: OK'.green.bold)
 
       const decodedToken = jwt.verify(token, process.env.JWT_SECRET)
 
@@ -201,11 +202,11 @@ export default {
 
       res.status(201).send(loggedUser)
 
-      console.log(`\nUser \'${loggedUser.username}\' found!`.cyan.bold)
+      console.log(`User "${loggedUser.username}" found`.cyan)
 
     } catch(err) {
 
-      console.log(`\nError on getting user: ${err.message}`.red.bold)
+      console.log(`Error on getting user: ${err.message}`.red)
 
       res.status(401).send({
         success: false,

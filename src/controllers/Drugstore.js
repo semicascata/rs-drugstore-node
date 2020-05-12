@@ -8,7 +8,7 @@ export default {
     const drugs = await Drug.find()
 
     if (!drugs) {
-      console.log('Drugstore is empty, check database...'.red)
+      console.log('Drugstore is empty, check database'.red)
 
       res.status(404).send({
         success: false,
@@ -16,7 +16,7 @@ export default {
       })
     }
 
-    console.log(`\nDrugstore OK.\nDrugs: ${drugs.length}`.green)
+    console.log(`Drugstore OK\nDrugs: ${drugs.length}`.green)
 
     res.status(200).send({
       success: true,
@@ -35,15 +35,15 @@ export default {
       const drug = await Drug.findById(drugId)
 
       if (!drug) {
-        console.log(`\nCannot find any drug by Id \'${drugId}\'`.red)
+        console.log(`Cannot find any drug by Id "${drugId}"`.red)
 
         res.status(404).send({
           success: false,
-          message: `No drugs founded by Id \'${drugId}\'`
+          message: `No drugs found by Id \'${drugId}\'`
         })
 
       } else if (drug) {
-        console.log(`\n\'${drug.name}\' founded!`.green)
+        console.log(`"${drug.name}" found`.green)
 
         res.status(200).send({
           success: true,
@@ -52,11 +52,11 @@ export default {
       }
 
     } catch (err) {
-      console.log(`\nCannot find any drug by Id \'${drugId}\'`.red.bold)
+      console.log(`Cannot find any drug by Id "${drugId}"`.red.bold)
 
       res.status(404).send({
         success: false,
-        message: `No drugs founded by Id \'${drugId}\'`
+        message: `No drugs founded by Id "${drugId}"`
       })
       return false
     }
@@ -110,9 +110,9 @@ export default {
       .then(drug => {
         // Check if the drug already exists
         if(drug) {
-          console.log(`\nThe drug \'${name}\' already exists`.red)
+          console.log(`Drug "${name}" already exists`.red)
           errors.push({
-            message: `The drug \'${name}\' already exists`
+            message: `Drug "${name}" already exists`
           })
           res.status(401).send({
             sucess: false,
@@ -132,7 +132,7 @@ export default {
           newDrug.save()
           .then(drug => {
 
-            console.log(`\nNew drug \'${newDrug.name}\' saved!`.green)
+            console.log(`Save new drug "${newDrug.name}"`.green)
 
             res.status(200).send({
               sucess: true,
@@ -141,7 +141,7 @@ export default {
           })
           .catch(err => {
 
-            console.log(`\nError when saving new drug: ${err.message}`.red)
+            console.log(`Error when saving new drug: ${err.message}`.red)
 
             res.status(401).send({
               success: false,
@@ -163,11 +163,11 @@ export default {
       let drug = await Drug.findById(drugId)
 
       if(!drug) {
-        console.log(`\nNo drug found with Id \'${drugId}\'`.red)
+        console.log(`No drug found with Id "${drugId}"`.red)
 
         res.status(404).send({
           success: false,
-          message: `No drug found with Id \'${drugId}\'`
+          message: `No drug found with Id "${drugId}"`
         })
 
       } else if(drug) {
@@ -176,17 +176,17 @@ export default {
           runValidators: true
         })
 
-        console.log(`\nDrug with Id \'${drugId}\' updated!`.green)
+        console.log(`Drug with Id "${drugId}" updated!`.green)
 
         res.status(200).send({
           success: true,
-          message: `Drug with Id \'${drugId}\' updated!`,
+          message: `Drug with Id "${drugId}" updated!`,
           drug
         })
       }
 
     } catch(err) {
-      console.log(`\nUpdate error: ${err.message}`.red)
+      console.log(`Update error: ${err.message}`.red)
 
       res.status(404).send({
         success: false,
@@ -207,17 +207,17 @@ export default {
       let drug = await Drug.findById(drugId)
 
       if(!drug) {
-        console.log(`\nNo drug found with Id \'${drugId}\'`.red)
+        console.log(`No drug found with Id "${drugId}"`.red)
 
         res.status(404).send({
           success: false,
-          message: `No drug found with Id \'${drugId}\'`
+          message: `No drug found with Id "${drugId}"`
         })
 
       } else if(drug) {
         drug.remove()
 
-        console.log('\nDrug deleted!'.green)
+        console.log('Drug deleted'.green)
 
         res.status(200).send({
           success: true,
@@ -226,8 +226,8 @@ export default {
       }
 
     } catch(err) {
-      console.log(`\nDelete error: ${err.message}`.red)
-      
+      console.log(`Delete error: ${err.message}`.red)
+
       res.status(404).send({
         success: false,
         error: `Delete error: ${err.message}`
