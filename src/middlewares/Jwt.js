@@ -9,8 +9,8 @@ export default {
     // Check if there is a token on cookies
     if (req.headers['x-access-token'] && req.headers['x-access-token'] !== undefined) {
       token = req.headers['x-access-token']
-      console.log(`X-Access-Token: ${token}`.green.bold)
-      // console.log('X-Access-Token: OK'.green.bold)
+      // console.log(`X-Access-Token: ${token}`.green.bold)
+      console.log('X-Access-Token: OK'.green.bold)
     }
 
     // if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {

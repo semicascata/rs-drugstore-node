@@ -36,7 +36,7 @@ app.use(helmet()) // Helmet Security Utilities
 // Request limiter
 const limiter = rateLimit({
   windowsMs: 10 * 60 * 1000, // 10 min
-  max: 10,
+  max: 100,
   message: 'Too many requests. Try again later'
 })
 app.use(limiter)
