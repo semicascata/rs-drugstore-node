@@ -20,6 +20,7 @@ export default (app) => {
     app.post(`${url}/auth/login`, AuthControl.login)
     app.get(`${url}/auth/logout`, AuthControl.logout)
     app.get(`${url}/auth/user`, Jwt.protect, AuthControl.user)
+    app.post(`${url}/auth/token`, AuthControl.token)
 
     // Drugstore
     app.get(`${url}/drugstore`, Jwt.protect, Drugstore.getDrugs)

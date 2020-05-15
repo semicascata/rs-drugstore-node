@@ -1,6 +1,7 @@
 import User from '../models/UserSchema'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
+let tokenList = []
 
 export default {
   // @desc Register handler
@@ -130,8 +131,14 @@ export default {
 
         // Sign user in
         const token = jwt.sign(payload, process.env.JWT_SECRET, {
-          expiresIn: 3600
+          expiresIn: '20m'
         })
+
+        // Refresh Token
+        const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH)
+        tokenList.push(refreshToken)
+
+        // console.log(tokenList)
 
         console.log(`User "${user.username}" logged in`.green)
         res.status(200).send({
@@ -139,8 +146,10 @@ export default {
           message: `User ${user.username} logged in!`,
           role: user.role,
           user: user.username,
-          token: token
+          token: token,
+          refreshToken: refreshToken
         })
+
 
       } else {
         console.log('Invalid password'.red)
@@ -151,6 +160,47 @@ export default {
       }
     }
   },
+  // @desc Refresh Token Handler
+  // @route GET /shelter/v1/auth/token
+  // @access Private
+  async token (req, res) {
+    const newToken = req.body.refreshToken
+    const username = req.body.username
+
+    if(newToken == null || tokenList.includes(newToken)) {
+      res.status(401).send('Session expired or invalid token')
+    }
+
+    // Find user on DB
+    const user = await User.findOne({ username })
+
+    const payload = {
+      id: user._id,
+      username: user.username,
+      role: user.role
+    }
+
+    // Sign in again
+    const token = jwt.sign(payload, process.env.JWT_REFRESH, {
+      expiresIn: '1h'
+    })
+
+    // Update Token List
+    tokenList.push(token)
+
+
+    console.log(`Token refreshed for user ${user.username}`.green)
+    res.status(200).send({token: token})
+    // .send({
+    //   sucess: true,
+    //   message: `Token refreshed for user ${user.username}`,
+    //   role: user.role,
+    //   user: user.username,
+    //   token: token
+    // })
+
+  },
+
   // @desc Logout Handler
   // @route GET /shelter/v1/auth/logout
   // @access Private
@@ -191,7 +241,8 @@ export default {
 
         // console.log(`Token from x-access: ${token}`.red.bold)
       }
-      console.log('Get User - X-Access-Token: OK'.green.bold)
+
+      // console.log('Get User - X-Access-Token: OK'.green.bold)
 
       const decodedToken = jwt.verify(token, process.env.JWT_SECRET)
 
@@ -202,7 +253,7 @@ export default {
 
       res.status(201).send(loggedUser)
 
-      console.log(`User "${loggedUser.username}" found`.cyan)
+      // console.log(`User "${loggedUser.username}" found`.cyan)
 
     } catch(err) {
 
