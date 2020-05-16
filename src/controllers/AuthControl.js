@@ -131,7 +131,7 @@ export default {
 
         // Sign user in
         const token = jwt.sign(payload, process.env.JWT_SECRET, {
-          expiresIn: '20m'
+          expiresIn: '1h'
         })
 
         // Refresh Token
@@ -165,11 +165,12 @@ export default {
   // @access Private
   async token (req, res) {
     const newToken = req.body.refreshToken
-    const username = req.body.username
 
     if(newToken == null || tokenList.includes(newToken)) {
       res.status(401).send('Session expired or invalid token')
     }
+
+    jwt.verify
 
     // Find user on DB
     const user = await User.findOne({ username })
