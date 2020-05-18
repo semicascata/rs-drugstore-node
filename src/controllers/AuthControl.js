@@ -144,12 +144,12 @@ export default {
 
         // Sign user in
         const token = jwt.sign(payload, process.env.JWT_SECRET, {
-          expiresIn: '5m'
+          expiresIn: '4m'
         })
 
         // Refresh Token
         const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH, {
-          expiresIn: 86400
+          expiresIn: '24h'
         })
 
         // Data to send to 'tokenList'
@@ -189,7 +189,6 @@ export default {
   // @access Private
   async token(req, res) {
     const refToken = req.body.refreshToken
-    const user = req.body.username
 
     try {
       if ((refToken) && (refToken in tokenList)) {
@@ -207,7 +206,7 @@ export default {
 
         // Sign in again
         const token = jwt.sign(payload, process.env.JWT_SECRET, {
-          expiresIn: '1h'
+          expiresIn: '4m'
         })
 
         // Update Token List
@@ -215,19 +214,23 @@ export default {
 
         // console.log(tokenList)
 
-        console.log(`Token refreshed for user ${user}`.green)
+        console.log(`Token refreshed for user ${userDecoded.username}`.green)
         res.status(200)
           // .send({token: token})
           .send({
-            sucess: true,
-            message: `Token refreshed for user ${user.username}`,
-            user: user.username,
+            success: true,
+            message: `Token refreshed for user ${userDecoded.username}`,
+            user: userDecoded.username,
             token: token
           })
       }
 
     } catch (err) {
       console.log(`Error on refresh token: ${err.message}`.red)
+      res.status(401).send({
+        success: false,
+        message: 'Unable to refresh the token'
+      })
     }
   },
 
@@ -236,26 +239,13 @@ export default {
   // @access Private
   logout(req, res) {
 
-    if (req.headers['x-access-token']) {
+    console.log('User logged out'.green.bold)
 
-      console.log('User logged out'.red)
-
-      res.status(201).send({
-        success: true,
-        message: 'User logged out',
-        token: null
-      })
-
-    } else {
-
-      console.log('User logged out, there is no X-Access-Token'.red)
-
-      res.status(201).send({
-        success: true,
-        message: 'User logged out',
-        token: null
-      })
-    }
+    res.status(204).send({
+      success: true,
+      message: 'User logged out',
+      token: null
+    })
   },
   // @desc Get User Info
   // @route GET /shelter/v1/auth/user
