@@ -25,7 +25,7 @@ export default (app) => {
     // Drugstore
     app.get(`${url}/drugstore`, Jwt.protect, Drugstore.getDrugs)
     app.get(`${url}/drugstore/:id`, Jwt.protect, Drugstore.getDrug)
-    app.post(`${url}/drugstore`, Jwt.authorize('admin'), Jwt.protect, Drugstore.createDrug)
+    app.post(`${url}/drugstore`, Jwt.authorize('admin', 'publisher'), Jwt.protect, Drugstore.createDrug)
     app.put(`${url}/drugstore/:id`, Jwt.authorize('admin'), Jwt.protect, Drugstore.updateDrug)
     app.delete(`${url}/drugstore/:id`, Jwt.authorize('admin'), Jwt.protect, Drugstore.deleteDrug)
 

@@ -78,12 +78,13 @@ export default {
 
     // Validations
     if(!name || !category || !description) {
+      console.log(req.body)
       errors.push({
         message: 'Please, at least fill in the fields \'Name\', \'Category\' and \'Description\''
       })
     }
 
-    if(use) {
+    if(use && use !== undefined) {
       if(use.length > 1000) {
         errors.push({
           message: 'Use tutorial cannot be more than 1000 characters'
@@ -91,10 +92,12 @@ export default {
       }
     }
 
-    if(description.length > 1000) {
-      errors.push({
-        message: 'Description cannot be more than 1000 characters'
-      })
+    if(description && description !== '') {
+      if(description.length > 1000) {
+        errors.push({
+          message: 'Description cannot be more than 1000 characters'
+        })
+      }
     }
 
     // If there is any error
@@ -135,7 +138,7 @@ export default {
             console.log(`Save new drug "${newDrug.name}"`.green)
 
             res.status(200).send({
-              sucess: true,
+              success: true,
               newDrug
             })
           })

@@ -202,7 +202,7 @@ export default {
           role: userDecoded.role
         }
 
-        console.log(payload)
+        // console.log(payload)
 
         // Sign in again
         const token = jwt.sign(payload, process.env.JWT_SECRET, {
@@ -214,7 +214,7 @@ export default {
 
         // console.log(tokenList)
 
-        console.log(`Token refreshed for user ${userDecoded.username}`.green)
+        console.log(`Token refreshed for user "${userDecoded.username}"`.green)
         res.status(200)
           // .send({token: token})
           .send({

@@ -52,10 +52,10 @@ export default {
   // Authorize Roles
   authorize (...roles) {
     return async (req, res, next) => {
+      // const user = req.user
 
-      const user = req.user
-
-      // console.log(user)
+      const token = req.headers['x-access-token']
+      const user = jwt.verify(token, process.env.JWT_SECRET)
 
       if(!roles.includes(user.role)) {
         console.log('User role is not authorized to access this route'.red)
