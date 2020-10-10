@@ -1,148 +1,142 @@
-import User from '../models/UserSchema'
+import User from "../models/UserSchema";
 
 export default {
   // @desc Get all users
   // @route GET /shelter/v1/users
   // @access Private
   async getUsers(req, res) {
-    const users = await User.find()
+    const users = await User.find();
 
     if (!users) {
-      console.log('There is no user, check database'.red)
+      console.log("There is no user, check database".red);
 
-      res.status(404).send({
+      res.status(404).json({
         success: false,
-        message: 'There is no user'
-      })
+        message: "There is no user",
+      });
     }
 
-    console.log(`Users OK\nUsers: ${users.length}`.green)
+    console.log(`Users OK\nUsers: ${users.length}`.green);
 
-    res.status(200).send({
+    res.status(200).json({
       success: true,
       length: users.length,
-      users
-    })
+      users,
+    });
   },
 
   // @desc Get single user
   // @route GET /shelter/v1/users/:id
   // @access Private
   async getUser(req, res) {
-    const userId = req.params.id
+    const userId = req.params.id;
 
     try {
-      const user = await User.findById(userId)
+      const user = await User.findById(userId);
 
       if (!user) {
-        console.log(`Cannot find any user by Id "${userId}"`.red)
+        console.log(`Cannot find any user by Id "${userId}"`.red);
 
-        res.status(404).send({
+        res.status(404).json({
           success: false,
-          message: `No users found by Id \'${userId}\'`
-        })
-
+          message: `No users found by Id \'${userId}\'`,
+        });
       } else if (user) {
-        console.log(`User "${user.username}" found`.green)
+        console.log(`User "${user.username}" found`.green);
 
-        res.status(200).send({
+        res.status(200).json({
           success: true,
-          user
-        })
+          user,
+        });
       }
-
     } catch (err) {
-      console.log(`Cannot find any user by Id "${userId}"`.red.bold)
+      console.log(`Cannot find any user by Id "${userId}"`.red.bold);
 
-      res.status(404).send({
+      res.status(404).json({
         success: false,
-        message: `No users found by Id "${userId}"`
-      })
-      return
+        message: `No users found by Id "${userId}"`,
+      });
+      return;
     }
   },
 
   // @desc Update user
   // @route PUT /shelter/v1/users/:id
   // @access Private
-  async updateUser (req, res) {
-    const userId = req.params.id
+  async updateUser(req, res) {
+    const userId = req.params.id;
 
     try {
-      let user = await User.findById(userId)
+      let user = await User.findById(userId);
 
-      if(!user) {
-        console.log(`No user found with Id "${userId}"`.red)
+      if (!user) {
+        console.log(`No user found with Id "${userId}"`.red);
 
-        res.status(404).send({
+        res.status(404).json({
           success: false,
-          message: `No user found with Id "${userId}"`
-        })
-
-      } else if(user) {
+          message: `No user found with Id "${userId}"`,
+        });
+      } else if (user) {
         user = await User.findByIdAndUpdate(userId, req.body, {
           new: true,
-          runValidators: true
-        })
+          runValidators: true,
+        });
 
-        console.log(`User with Id "${userId}" updated!`.green)
+        console.log(`User with Id "${userId}" updated!`.green);
 
-        res.status(200).send({
+        res.status(200).json({
           success: true,
           message: `User with Id "${userId}" updated!`,
-          user
-        })
+          user,
+        });
       }
+    } catch (err) {
+      console.log(`Update error: ${err.message}`.red);
 
-    } catch(err) {
-      console.log(`Update error: ${err.message}`.red)
-
-      res.status(404).send({
+      res.status(404).json({
         success: false,
-        error: `${err.message}`
-      })
+        error: `${err.message}`,
+      });
 
-      return
+      return;
     }
   },
 
   // @desc Delete user
   // @route DELETE /shelter/v1/users/:id
   // @access Private
-  async deleteUser (req, res) {
-    const userId = req.params.id
+  async deleteUser(req, res) {
+    const userId = req.params.id;
 
     try {
-      let user = await User.findById(userId)
+      let user = await User.findById(userId);
 
-      if(!user) {
-        console.log(`No user found with Id "${userId}"`.red)
+      if (!user) {
+        console.log(`No user found with Id "${userId}"`.red);
 
-        res.status(404).send({
+        res.status(404).json({
           success: false,
-          message: `No user found with Id "${userId}"`
-        })
+          message: `No user found with Id "${userId}"`,
+        });
+      } else if (user) {
+        user.remove();
 
-      } else if(user) {
-        user.remove()
+        console.log("User deleted".green);
 
-        console.log('User deleted'.green)
-
-        res.status(200).send({
+        res.status(200).json({
           success: true,
-          message: 'User deleted'
-        })
+          message: "User deleted",
+        });
       }
+    } catch (err) {
+      console.log(`Delete error: ${err.message}`.red);
 
-    } catch(err) {
-      console.log(`Delete error: ${err.message}`.red)
-
-      res.status(404).send({
+      res.status(404).json({
         success: false,
-        error: `Delete error: ${err.message}`
-      })
+        error: `Delete error: ${err.message}`,
+      });
 
-      return
+      return;
     }
-  }
-}
+  },
+};

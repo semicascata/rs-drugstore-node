@@ -1,99 +1,87 @@
-import User from '../models/UserSchema'
-import jwt from 'jsonwebtoken'
-import bcrypt from 'bcryptjs'
-let tokenList = {}
+import User from "../models/UserSchema";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+let tokenList = {};
 
 export default {
   // @desc Register handler
   // @route POST /shelter/v1/auth/register
   // @access Public
   async register(req, res) {
-    const {
-      username,
-      email,
-      password,
-      password2,
-      role
-    } = req.body
-    let errors = [] // Validation errors
+    const { username, email, password, password2, role } = req.body;
+    let errors = []; // Validation errors
 
     // Check empty fields
     if (!username || !email || !password || !password2) {
       errors.push({
-        message: 'Please, fill in all fields'
-      })
+        message: "Please, fill in all fields",
+      });
     }
 
     // Password match
     if (password !== password2) {
       errors.push({
-        message: 'Passwords don\'t match'
-      })
+        message: "Passwords don't match",
+      });
     }
 
     // Password length
     if (password.length < 6) {
       errors.push({
-        message: 'Password should be at least 6 charaters'
-      })
+        message: "Password should be at least 6 charaters",
+      });
     }
 
     if (errors.length > 0) {
       // If there is any validation errors
       console.log(errors);
-      res.status(401).send(
-        errors,
-        username,
-        email,
-        password,
-        password2
-      )
-
+      res.status(401).json(errors, username, email, password, password2);
     } else {
       // Check if user exists
       await User.findOne({
-          username
-        })
-        .then(user => {
-          if (user) {
-            console.log(`\nUser ${username} already exists`.red.bold)
-            errors.push({
-              message: `User ${username} already exists`
+        username,
+      }).then((user) => {
+        if (user) {
+          console.log(`\nUser ${username} already exists`.red.bold);
+          errors.push({
+            message: `User ${username} already exists`,
+          });
+
+          res.status(401).json(errors, username, email, password, password2);
+        } else {
+          // If its a new user
+          const newUser = new User({
+            username,
+            email,
+            password,
+            role,
+          });
+
+          // Save user on DB
+          newUser
+            .save()
+            .then((user) => {
+              console.log(
+                `User "${newUser.username}" registered\n User role: ${newUser.role}`
+                  .green.bold
+              );
+
+              res.status(201).json(user);
             })
+            .catch((err) => {
+              console.log(
+                `Error when trying to save the user "${newUser.username}"\nError: ${err.message}`
+                  .red.bold
+              );
 
-            res.status(401).send(
-              errors,
-              username,
-              email,
-              password,
-              password2
-            )
-
-          } else {
-            // If its a new user
-            const newUser = new User({
-              username,
-              email,
-              password,
-              role
-            })
-
-            // Save user on DB
-            newUser.save()
-              .then(user => {
-
-                console.log(`User "${newUser.username}" registered\n User role: ${newUser.role}`.green.bold)
-
-                res.status(201).send(user)
-              })
-              .catch(err => {
-
-                console.log(`Error when trying to save the user "${newUser.username}"\nError: ${err.message}`.red.bold)
-
-                res.status(401).send(`Error when trying to save the user \"${newUser.username}\"`)
-              })
-          }
-        })
+              res
+                .status(401)
+                .json(
+                  `Error when trying to save the user \"${newUser.username}\"`
+                );
+            });
+        }
+      });
     }
   },
 
@@ -101,86 +89,80 @@ export default {
   // @route POST /shelter/v1/auth/login
   // @access Public
   async login(req, res) {
-    const {
-      username,
-      password
-    } = req.body
+    const { username, password } = req.body;
 
     // Validation
     if (!username || !password) {
-      console.log('Please, provide an username and password'.red)
-      res.status(401).send({
+      console.log("Please, provide an username and password".red);
+      res.status(401).json({
         success: false,
-        message: 'Please, provide an username and password'
-      })
-      return false
+        message: "Please, provide an username and password",
+      });
+      return false;
     }
 
     // Search user on DB
     const user = await User.findOne({
-      username
-    }).select('+password')
+      username,
+    }).select("+password");
 
     // Check if user exists
     if (!user) {
-      console.log(`Failed. User ${username} not found`.red)
+      console.log(`Failed. User ${username} not found`.red);
 
-      res.status(404).send({
+      res.status(404).json({
         success: false,
-        message: `User ${username} not found`
-      })
-
+        message: `User ${username} not found`,
+      });
     } else {
       // Match password
-      const isMatch = bcrypt.compareSync(req.body.password, user.password)
+      const isMatch = bcrypt.compareSync(req.body.password, user.password);
 
       if (isMatch === true) {
         // Required options to exchange the JWT Token
         const payload = {
           id: user._id,
           username: user.username,
-          role: user.role
-        }
+          role: user.role,
+        };
 
         // Sign user in
         const token = jwt.sign(payload, process.env.JWT_SECRET, {
-          expiresIn: '4m'
-        })
+          expiresIn: "4m",
+        });
 
         // Refresh Token
         const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH, {
-          expiresIn: '24h'
-        })
+          expiresIn: "24h",
+        });
 
         // Data to send to 'tokenList'
         const data = {
           user: user.username,
           role: user.role,
           token: token,
-          refreshToken: refreshToken
-        }
+          refreshToken: refreshToken,
+        };
 
         // Insert the data to the Object 'tokenList'
-        tokenList[refreshToken] = data
+        tokenList[refreshToken] = data;
         // console.log(tokenList)
 
-        console.log(`User "${user.username}" logged in`.green)
-        res.status(200).send({
+        console.log(`User "${user.username}" logged in`.green);
+        res.status(200).json({
           sucess: true,
           message: `User ${user.username} logged in!`,
           user: user.username,
           role: user.role,
           token: token,
-          refreshToken: refreshToken
-        })
-
-
+          refreshToken: refreshToken,
+        });
       } else {
-        console.log('Invalid password'.red)
-        res.status(401).send({
+        console.log("Invalid password".red);
+        res.status(401).json({
           success: false,
-          message: 'Invalid password'
-        })
+          message: "Invalid password",
+        });
       }
     }
   },
@@ -188,49 +170,48 @@ export default {
   // @route POST /shelter/v1/auth/token
   // @access Private
   async token(req, res) {
-    const refToken = req.body.refreshToken
+    const refToken = req.body.refreshToken;
 
     try {
-      if ((refToken) && (refToken in tokenList)) {
-
+      if (refToken && refToken in tokenList) {
         // Decoding Refresh Token to get the user
-        const userDecoded = jwt.verify(refToken, process.env.JWT_REFRESH)
+        const userDecoded = jwt.verify(refToken, process.env.JWT_REFRESH);
 
         const payload = {
           id: userDecoded.id,
           username: userDecoded.username,
-          role: userDecoded.role
-        }
+          role: userDecoded.role,
+        };
 
         // console.log(payload)
 
         // Sign in again
         const token = jwt.sign(payload, process.env.JWT_SECRET, {
-          expiresIn: '4m'
-        })
+          expiresIn: "4m",
+        });
 
         // Update Token List
-        tokenList[refToken].token = token
+        tokenList[refToken].token = token;
 
         // console.log(tokenList)
 
-        console.log(`Token refreshed for user "${userDecoded.username}"`.green)
-        res.status(200)
-          // .send({token: token})
-          .send({
+        console.log(`Token refreshed for user "${userDecoded.username}"`.green);
+        res
+          .status(200)
+          // .json({token: token})
+          .json({
             success: true,
             message: `Token refreshed for user ${userDecoded.username}`,
             user: userDecoded.username,
-            token: token
-          })
+            token: token,
+          });
       }
-
     } catch (err) {
-      console.log(`Error on refresh token: ${err.message}`.red)
-      res.status(401).send({
+      console.log(`Error on refresh token: ${err.message}`.red);
+      res.status(401).json({
         success: false,
-        message: 'Unable to refresh the token'
-      })
+        message: "Unable to refresh the token",
+      });
     }
   },
 
@@ -238,51 +219,47 @@ export default {
   // @route GET /shelter/v1/auth/logout
   // @access Private
   logout(req, res) {
+    console.log("User logged out".green.bold);
 
-    console.log('User logged out'.green.bold)
-
-    res.status(204).send({
+    res.status(204).json({
       success: true,
-      message: 'User logged out',
-      token: null
-    })
+      message: "User logged out",
+      token: null,
+    });
   },
   // @desc Get User Info
   // @route GET /shelter/v1/auth/user
   // @access Private
   async user(req, res) {
-    let token
+    let token;
 
     try {
       // Check if there is a token
-      if (req.headers['x-access-token']) {
-
-        token = req.headers['x-access-token']
+      if (req.headers["x-access-token"]) {
+        token = req.headers["x-access-token"];
 
         // console.log(`Token from x-access: ${token}`.red.bold)
       }
 
       // console.log('Get User - X-Access-Token: OK'.green.bold)
 
-      const decodedToken = jwt.verify(token, process.env.JWT_SECRET)
+      const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
 
-      const loggedUser = await User.findById(decodedToken.id)
-      req.user = loggedUser
+      const loggedUser = await User.findById(decodedToken.id);
+      req.user = loggedUser;
 
       // console.log(loggedUser)
 
-      res.status(201).send(loggedUser)
+      res.status(201).json(loggedUser);
 
       // console.log(`User "${loggedUser.username}" found`.cyan)
-
     } catch (err) {
+      console.log(`Error on getting user: ${err.message}`.red);
 
-      console.log(`Error on getting user: ${err.message}`.red)
-
-      res.status(401).send({
+      res.status(401).json({
         success: false,
-        message: 'Cannot get the user'
-      })
+        message: "Cannot get the user",
+      });
     }
-  }
-}
+  },
+};

@@ -10,7 +10,7 @@ export default {
     if (!drugs) {
       console.log('Drugstore is empty, check database'.red)
 
-      res.status(404).send({
+      res.status(404).json({
         success: false,
         message: 'The drugstore is empty'
       })
@@ -18,7 +18,7 @@ export default {
 
     console.log(`Drugstore OK\nDrugs: ${drugs.length}`.green)
 
-    res.status(200).send({
+    res.status(200).json({
       success: true,
       length: drugs.length,
       drugs
@@ -37,7 +37,7 @@ export default {
       if (!drug) {
         console.log(`Cannot find any drug by Id "${drugId}"`.red)
 
-        res.status(404).send({
+        res.status(404).json({
           success: false,
           message: `No drugs found by Id \'${drugId}\'`
         })
@@ -45,7 +45,7 @@ export default {
       } else if (drug) {
         console.log(`"${drug.name}" found`.green)
 
-        res.status(200).send({
+        res.status(200).json({
           success: true,
           drug
         })
@@ -54,7 +54,7 @@ export default {
     } catch (err) {
       console.log(`Cannot find any drug by Id "${drugId}"`.red.bold)
 
-      res.status(404).send({
+      res.status(404).json({
         success: false,
         message: `No drugs founded by Id "${drugId}"`
       })
@@ -103,7 +103,7 @@ export default {
     // If there is any error
     if(errors.length > 0) {
       console.log(errors)
-      res.status(401).send({
+      res.status(401).json({
         sucess: false,
         errors
       })
@@ -117,7 +117,7 @@ export default {
           errors.push({
             message: `Drug "${name}" already exists`
           })
-          res.status(401).send({
+          res.status(401).json({
             sucess: false,
             errors
           })
@@ -137,7 +137,7 @@ export default {
 
             console.log(`Save new drug "${newDrug.name}"`.green)
 
-            res.status(200).send({
+            res.status(200).json({
               success: true,
               newDrug
             })
@@ -146,7 +146,7 @@ export default {
 
             console.log(`Error when saving new drug: ${err.message}`.red)
 
-            res.status(401).send({
+            res.status(401).json({
               success: false,
               error: err
             })
@@ -168,7 +168,7 @@ export default {
       if(!drug) {
         console.log(`No drug found with Id "${drugId}"`.red)
 
-        res.status(404).send({
+        res.status(404).json({
           success: false,
           message: `No drug found with Id "${drugId}"`
         })
@@ -181,7 +181,7 @@ export default {
 
         console.log(`Drug with Id "${drugId}" updated!`.green)
 
-        res.status(200).send({
+        res.status(200).json({
           success: true,
           message: `Drug with Id "${drugId}" updated!`,
           drug
@@ -191,7 +191,7 @@ export default {
     } catch(err) {
       console.log(`Update error: ${err.message}`.red)
 
-      res.status(404).send({
+      res.status(404).json({
         success: false,
         error: `${err.message}`
       })
@@ -212,7 +212,7 @@ export default {
       if(!drug) {
         console.log(`No drug found with Id "${drugId}"`.red)
 
-        res.status(404).send({
+        res.status(404).json({
           success: false,
           message: `No drug found with Id "${drugId}"`
         })
@@ -222,7 +222,7 @@ export default {
 
         console.log('Drug deleted'.green)
 
-        res.status(200).send({
+        res.status(200).json({
           success: true,
           message: 'Drug deleted'
         })
@@ -231,7 +231,7 @@ export default {
     } catch(err) {
       console.log(`Delete error: ${err.message}`.red)
 
-      res.status(404).send({
+      res.status(404).json({
         success: false,
         error: `Delete error: ${err.message}`
       })
