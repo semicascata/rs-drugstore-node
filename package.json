@@ -4,9 +4,12 @@
   "description": "Ravel's Shelter Drugstore",
   "main": "src/index.js",
   "scripts": {
+    "clean": "rm -rf build && mkdir build",
+    "build-server": "babel -d ./build ./src -s",
+    "build": "npm run clean && npm run build-server",
     "start": "node --exec babel-node src/index.js",
     "dev": "NODE_ENV=development nodemon --exec babel-node src/index.js",
-    "prod": "babel-node src/index.js"
+    "prod": "node ./build/index.js"
   },
   "author": "R. Duarte",
   "license": "ISC",

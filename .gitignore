@@ -3,3 +3,4 @@ _data/
 seeder.js
 run.js
 src/config/config.env
+build/
