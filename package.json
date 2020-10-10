@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node --exec babel-node src/index.js",
     "dev": "NODE_ENV=development nodemon --exec babel-node src/index.js",
-    "prod": "NODE_ENV=production nodemon --exec babel-node src/index.js"
+    "prod": "nodemon --exec babel-node src/index.js"
   },
   "author": "R. Duarte",
   "license": "ISC",
